@@ -1,0 +1,21 @@
+<div id="auth-wrapper">
+ <h1><a href="/">Are you an Early Adopter?</a></h1>
+
+ <h2><%= username || ''%></h2>
+
+ <ul id="auth" class="profile">
+  <% for (var i = 0; i < services.length; i++) { %>
+  <li id="<%= services[i].name.toLowerCase() %>"><%- services[i].html %></li>
+  <% } %>
+ </ul>
+
+ <div id="viral">Want your own profile? <a href="/">Sign up!</a></div>
+
+ <div id="empowered">
+  <a href="https://dev.singly.com/"><img src="/images/singly-button.png" /></a>
+ </div>
+
+ <div id="credits">
+  Created by <a href="http://www.beaugunderson.com/">Beau Gunderson</a> during an internal hack day at <a href="https://singly.com">Singly</a>.
+ </div>
+</div>

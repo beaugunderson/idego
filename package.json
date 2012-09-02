@@ -1,0 +1,17 @@
+{
+   "name": "idego.co",
+   "version": "0.0.0",
+   "dependencies": {
+      "async": "*",
+      "cheerio": "*",
+      "express": "2.5.x",
+      "ejs": "*",
+      "request": "*",
+      "sprintf": "*",
+      "querystring": "*",
+      "mongodb": "*",
+      "oauth": "*",
+      "underscore": "*",
+      "connect-mongo": "*"
+   }
+}

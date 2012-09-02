@@ -1,0 +1,39 @@
+<div id="auth-wrapper">
+ <h1><a href="/">Are you an Early Adopter?</a></h1>
+
+ <div id="description">Authenticate with the services below and see how your user ID stacks up. Wary or lazy? <a href="/example.png">Click here for an example.</a></div>
+
+ <p style="font-size: 0.9em; margin-top: 1em;"><em>Holy bandwidth, Batman!</em> There's been a lot of interest, please be patient while things load.</p>
+
+ <div id="ajax-error" class="alert alert-error">
+  <p>Sorry, there was an error retrieving your data. We've been alerted and are <a href="buttons.gif">working on the issue</a>.</p>
+
+  <!--
+   <div id="ajax-error-details"></div>
+  -->
+ </div>
+
+ <ul id="auth">
+  <% for (var i = 0; i < services.length; i++) { %>
+  <li id="<%= services[i].name.toLowerCase() %>"><%- services[i].link %></li>
+  <% } %>
+ </ul>
+
+ <div id="idego"></div>
+
+ <div id="twitter-text-wrapper">
+  &ldquo;<span id="twitter-text"></span>&rdquo;
+
+  <a href="https://twitter.com/share" id="twitter-share-best" class="twitter-share-button" data-lang="en" data-count="none" data-via="idegoco" data-related="idegoco:Are you a true Early Adopter?">Tweet</a>
+ </div>
+
+ <div id="profile-link"></div>
+
+ <div id="empowered">
+  <a href="https://dev.singly.com/"><img src="/images/singly-button.png" /></a>
+ </div>
+
+ <div id="credits">
+  Created by <a href="http://www.beaugunderson.com/">Beau Gunderson</a> during an internal hack day at <a href="https://singly.com">Singly</a>.
+ </div>
+</div>
