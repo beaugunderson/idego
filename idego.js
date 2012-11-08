@@ -1,5 +1,4 @@
 var express = require('express');
-var fs = require('fs');
 var querystring = require('querystring');
 var request = require('request');
 var sprintf = require('sprintf').sprintf;
@@ -15,8 +14,6 @@ var db = new mongo.Db('idego', server);
 var idego;
 var profiles;
 var counters;
-
-var config = JSON.parse(fs.readFileSync('config.json'));
 
 db.open(function (err, idegoDb) {
   if (err) {
@@ -46,7 +43,8 @@ var usedServices = [
   'Twitter'
 ];
 
-var oa = new OAuth2(config.clientId, config.clientSecret, process.env.API_URL);
+var oa = new OAuth2(process.env.SINGLY_CLIENT_ID,
+  process.env.SINGLY_CLIENT_SECRET, process.env.API_URL);
 
 // A convenience method that takes care of adding the access token to requests
 function getProtectedResource(path, session, callback) {
@@ -64,7 +62,7 @@ function getLink(prettyName, profiles) {
   }
 
   var queryString = querystring.stringify({
-    client_id: config.clientId,
+    client_id: process.env.SINGLY_CLIENT_ID,
     redirect_uri: sprintf('%s/callback', process.env.HOST_URL),
     service: service
   });
@@ -90,7 +88,7 @@ app.configure(function () {
   app.use(express.bodyParser());
   app.use(express.cookieParser());
   app.use(express.session({
-    secret: config.sessionSecret,
+    secret: process.env.SESSION_SECRET,
     store: new MongoStore({
       db: 'idego-sessions'
     })
@@ -249,8 +247,8 @@ app.get('/profile/:id', function (req, res) {
 
 app.get('/callback', function (req, res) {
   var data = {
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
+    client_id: process.env.SINGLY_CLIENT_ID,
+    client_secret: process.env.SINGLY_CLIENT_SECRET,
     code: req.param('code')
   };
 
