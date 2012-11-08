@@ -1,20 +1,9 @@
-/*
-$page: #464646;
-$middle: #5b605f;
-$header: #a90641;
-$accent: #a1a194;
-$text: #fcfad0;
-*/
-/*
-$page: #e7e8d1;
-$middle: #fbf7e4;
-$header: #8e001c;
-$accent: #d3ceea;
-$text: #424242;
-*/
 html, body {
   height: 100%;
   min-height: 100%; }
+
+#google-ads {
+  margin-top: 1em; }
 
 #profile-link {
   font-size: 0.9em;
@@ -25,12 +14,16 @@ html, body {
 #viral {
   margin-bottom: 1.5em; }
 
+#averages {
+  display: none; }
+
 #idego {
-  margin-bottom: 1.5em;
+  display: none;
   padding-left: 2em;
   font-size: 0.8em; }
 
 #twitter-text-wrapper {
+  margin-top: 1.5em;
   margin-bottom: 0.5em;
   border-radius: 5px;
   padding: 1.5em;
@@ -41,7 +34,7 @@ html, body {
 .twitter-share-button {
   margin-left: 0.5em; }
 
-span.accent {
+span.accent, #averages span {
   color: #ffc1a9; }
 
 body {
@@ -74,6 +67,7 @@ a, a:visited {
   min-height: 100%; }
 
 img.connected {
+  margin-left: 11px;
   margin-right: 1em; }
 
 #id {
