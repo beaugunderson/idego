@@ -161,6 +161,25 @@ app.get('/users', function (req, res) {
   });
 });
 
+app.get('/leaderboard/:service', function (req, res) {
+  if (!req.param('service')) {
+    res.send(404);
+  }
+
+  var key = 'profiles.' + req.param('service');
+
+  var fields = ['username', 'counterId', key];
+
+  var query = {};
+
+  query[key + '.0'] = { $exists: true, $gt: -1 };
+
+  PROFILES.find(query, fields).sort(key + '.0').limit(50).toArray(function (err,
+    profiles) {
+    res.send(profiles);
+  });
+});
+
 function renderIndex(req, res, isPublic) {
   var services = [];
 
