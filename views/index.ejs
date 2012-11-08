@@ -3,8 +3,6 @@
 
  <div id="description">Authenticate with the services below and see how your user ID stacks up. Wary or lazy? <a href="/example.png">Click here for an example.</a></div>
 
- <p style="font-size: 0.9em; margin-top: 1em;"><em>Holy bandwidth, Batman!</em> There's been a lot of interest, please be patient while things load.</p>
-
  <div id="ajax-error" class="alert alert-error">
   <p>Sorry, there was an error retrieving your data. We've been alerted and are <a href="buttons.gif">working on the issue</a>.</p>
 
@@ -18,6 +16,12 @@
   <li id="<%= services[i].name.toLowerCase() %>"><%- services[i].link %></li>
   <% } %>
  </ul>
+
+ <div id="averages">
+  <p>Your weighted average percentage is <span id="average-percentage"></span>. In other words, on average you join a service before <span id="average-percentage-inverse"></span> of the rest of its users.</p>
+
+  <p>Your weighted average user ID is <span id="average-id"></span>.</p>
+ </div>
 
  <div id="idego"></div>
 
