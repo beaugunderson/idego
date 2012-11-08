@@ -3,3 +3,5 @@ run.sh
 .sass-cache
 config.json
 public/users.json
+.env
+data
