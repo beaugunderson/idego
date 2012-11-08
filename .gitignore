@@ -2,3 +2,4 @@ node_modules
 run.sh
 .sass-cache
 config.json
+public/users.json
