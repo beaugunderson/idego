@@ -2,19 +2,17 @@
 
 var baseUrl = 'https://api.singly.com';
 
-function get(url, options, callback) {
-  if (options === undefined ||
-    options === null) {
-    options = {};
-  }
-
-  options.access_token = accessToken;
-
-  $.getJSON(baseUrl + url, options, callback);
-}
-
 var singly = {
-  get: get
+  get: function (url, options, callback) {
+    if (options === undefined ||
+      options === null) {
+      options = {};
+    }
+
+    options.access_token = accessToken;
+
+    $.getJSON(baseUrl + url, options, callback);
+  }
 };
 
 var spinnerOptions = {
@@ -29,7 +27,7 @@ var spinnerOptions = {
   shadow: false,
   hwaccel: true,
   className: 'spinner',
-  zIndex: 2e9,
+  zIndex: 1e3,
   top: 15,
   left: 90
 };
@@ -157,6 +155,95 @@ function blendedAverage(profiles, users) {
   };
 }
 
+function doPublic(users) {
+  // XXX: Better logic here.
+  if ($('ul.profile').length === 2) {
+    $('ul.profile').each(function () {
+      var profiles = {};
+
+      $(this).find('.result').each(function () {
+        var id = parseInt($(this).attr('data-id'), 10);
+        var service = $(this).attr('data-service');
+
+        if (!id) {
+          $(this).html('None');
+
+          return;
+        }
+
+        profiles[service] = [id];
+
+        var percentage = Math.round(((id / users[service]) * 100) * 100) / 100;
+
+        $(this).html('<span class="accent">' + commas(id) +
+          '</span> (<span class="accent">' + percentage + '%</span>)');
+      });
+
+      var average = blendedAverage(profiles, users);
+
+      $(this).append('<li class="centered">Average: ' +
+          Math.round((average.percentage * 100) * 100) / 100 + '%' +
+        '</li>');
+    });
+
+    return;
+  }
+
+  if (accessToken !== 'undefined' &&
+    accessToken !== undefined) {
+    $('#username').editable('/username', {
+      submitdata: {
+        accessToken: accessToken
+      },
+      callback: function (value) {
+        $('#username').text(value);
+      }
+    });
+  }
+
+  $('.result').each(function () {
+    var id = parseInt($(this).attr('data-id'), 10);
+    var service = $(this).attr('data-service');
+
+    var percentage = Math.round(((id / users[service]) * 100) * 100) / 100;
+
+    $(this).html('User <span class="accent">' + commas(id) +
+      '</span>: In the first <span class="accent">' + percentage +
+      '%</span> of users.');
+  });
+
+  return;
+}
+
+function doFriends() {
+  singly.get('/friends/peers', { sort: 'first' }, function (friends) {
+    friends.forEach(function (friend) {
+      $('#friends-list').append(sprintf('<li><a href="%s">' +
+          '<span class="image-wrap card" style="background-image: url(%s);" /> ' +
+          '%s' +
+        '</a></li>',
+        '/compare/' + counterId + '/' + friend.peer,
+        friend.thumbnail_url,
+        friend.name));
+    });
+
+    if (friends.length > 4) {
+      $('#friends-more a').click(function () {
+        $('#friends').toggleClass('more');
+
+        $('#friends-more a').text(
+          $('#friends-more a').text() === 'More' ? 'Less' : 'More');
+      });
+
+      $('#friends-more').css('display', 'table-cell');
+    }
+
+    if (friends.length) {
+      $('#friends').show();
+    }
+  });
+}
+
 $(function () {
   $('#ajax-error').ajaxError(function (e, jqxhr, settings, exception) {
     $(this).show();
@@ -170,16 +257,8 @@ $(function () {
 
   $.getJSON('/users.json', function (users) {
     if (isPublic) {
-      $('.result').each(function () {
-        var id = parseInt($(this).attr('data-id'), 10);
-        var service = $(this).attr('data-service');
-
-        var percentage = Math.round(((id / users[service]) * 100) * 100) / 100;
-
-        $(this).html('User <span class="accent">' + commas(id) +
-          '</span>: In the first <span class="accent">' + percentage +
-          '%</span> of users.');
-      });
+      doPublic(users);
+      doFriends();
 
       return;
     }
@@ -189,13 +268,9 @@ $(function () {
       return;
     }
 
+    doFriends();
+
     singly.get('/profiles', null, function (profiles) {
-      var lowest = 100;
-
-      var twitterText = '';
-
-      console.log('blendedAverage', blendedAverage(profiles, users));
-
       var average = blendedAverage(profiles, users);
 
       $('#average-id').text(commas(average.id));
@@ -204,6 +279,9 @@ $(function () {
       $('#average-percentage-inverse').text(Math.round(((1 - average.percentage) * 100) * 100) / 100 + '%');
 
       $('#averages').show();
+
+      var lowest = 100;
+      var twitterText = '';
 
       _.each(profiles, function (profile, service) {
         if (!Array.isArray(profile)) {

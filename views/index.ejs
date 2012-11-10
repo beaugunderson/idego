@@ -1,4 +1,4 @@
-<div id="auth-wrapper">
+<div class="<%= pageClass %>">
  <h1><a href="/">Are you an Early Adopter?</a></h1>
 
  <div id="description">Authenticate with the services below and see how your user ID stacks up. Wary or lazy? <a href="/example.png">Click here for an example.</a></div>
@@ -11,17 +11,17 @@
   -->
  </div>
 
- <ul id="auth">
-  <% for (var i = 0; i < services.length; i++) { %>
-  <li id="<%= services[i].name.toLowerCase() %>"><%- services[i].link %></li>
-  <% } %>
- </ul>
-
  <div id="averages">
   <p>Your weighted average percentage is <span id="average-percentage"></span>. In other words, on average you join a service before <span id="average-percentage-inverse"></span> of the rest of its users.</p>
 
   <p>Your weighted average user ID is <span id="average-id"></span>.</p>
  </div>
+
+ <ul id="auth">
+  <% for (var i = 0; i < services.length; i++) { %>
+  <li id="<%= services[i].name.toLowerCase() %>"><%- services[i].link %></li>
+  <% } %>
+ </ul>
 
  <div id="idego"></div>
 
@@ -33,11 +33,7 @@
 
  <div id="profile-link"></div>
 
- <div id="empowered">
-  <a href="https://singly.com/"><img src="/images/singly-button.png" /></a>
- </div>
+ <%- partial('footer') %>
 
- <div id="credits">
-  Created by <a href="http://www.beaugunderson.com/">Beau Gunderson</a> during an internal hack day at <a href="https://singly.com">Singly</a>.
- </div>
+ <%- partial('friends') %>
 </div>

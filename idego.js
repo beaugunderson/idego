@@ -1,3 +1,4 @@
+var async = require('async');
 var express = require('express');
 var OAuth2 = require('oauth').OAuth2;
 var querystring = require('querystring');
@@ -10,7 +11,7 @@ var MongoStore = require('connect-mongo')(express);
 var mongo = require('mongodb');
 
 var server = new mongo.Server('localhost', 27017, { auto_reconnect: true });
-var db = new mongo.Db('idego', server);
+var db = new mongo.Db('idego', server, { safe: true });
 
 var PROFILES;
 var COUNTERS;
@@ -233,6 +234,7 @@ function renderIndex(req, res, isPublic) {
 
   // Render out views/index.ejs, passing in the array of links and the session
   res.render('index', {
+    pageClass: req.session.access_token ? 'authenticated' : '',
     services: services,
     isPublic: isPublic,
     accessToken: req.session.access_token,
@@ -257,6 +259,85 @@ app.get('/', function (req, res) {
   } else {
     renderIndex(req, res, false);
   }
+});
+
+function getServices(profile) {
+  var services = [];
+
+  // For each service in usedServices, get the score
+  usedServices.forEach(function (service) {
+    services.push({
+      name: service,
+      html: sprintf('<img class="connected" ' +
+        'src="http://assets.singly.com/service-icons/32px/%s.png" ' +
+        'title="%s" /> <span class="result" data-service="%s" ' +
+        'data-id="%s"></span>',
+        service.toLowerCase(),
+        service,
+        service.toLowerCase(),
+        profile.profiles[service.toLowerCase()] ?
+        profile.profiles[service.toLowerCase()] : '')
+    });
+  });
+
+  return services;
+}
+
+app.post('/username', function (req, res) {
+  var accessToken = req.param('accessToken');
+  var value = req.param('value');
+
+  if (accessToken && value) {
+    return PROFILES.update({ accessToken: accessToken },
+      { $set: { username: value } },
+      { safe: true },
+      function (err) {
+        if (err) return res.send(500);
+        res.send(value);
+      });
+  }
+
+  res.send(500);
+});
+
+app.get('/compare/:id/:comparisonId', function (req, res) {
+  async.parallel({
+    one: function (cb) {
+      PROFILES.findOne({ counterId: parseInt(req.params.id, 10) },
+        function (err, profile) {
+        if (err || !profile) {
+          return cb(err);
+        }
+
+        cb(null, profile);
+      });
+    },
+    two: function (cb) {
+      PROFILES.findOne({ _id: req.params.comparisonId },
+        function (err, profile) {
+        if (err || !profile) {
+          return cb(err);
+        }
+
+        cb(null, profile);
+      });
+    }
+  }, function (err, results) {
+    if (err) {
+      return res.send(404);
+    }
+
+    res.render('compare', {
+      pageClass: req.session.access_token ? 'authenticated' : '',
+      accessToken: req.session.access_token,
+      counterId: req.session.counterId,
+      isPublic: true,
+      one: results.one,
+      two: results.two,
+      oneServices: getServices(results.one),
+      twoServices: getServices(results.two)
+    });
+  });
 });
 
 app.get('/profiles/:id', function (req, res) {
@@ -290,7 +371,7 @@ app.get('/profile/:id', function (req, res) {
     });
 
     res.render('profile', {
-      accessToken: undefined,
+      accessToken: req.session.access_token,
       isPublic: true,
       services: services,
       username: profile.username,
