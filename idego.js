@@ -1,8 +1,9 @@
 var express = require('express');
+var OAuth2 = require('oauth').OAuth2;
 var querystring = require('querystring');
 var request = require('request');
 var sprintf = require('sprintf').sprintf;
-var OAuth2 = require('oauth').OAuth2;
+var _ = require('underscore');
 
 var MongoStore = require('connect-mongo')(express);
 
@@ -11,44 +12,56 @@ var mongo = require('mongodb');
 var server = new mongo.Server('localhost', 27017, { auto_reconnect: true });
 var db = new mongo.Db('idego', server);
 
-var idego;
-var profiles;
-var counters;
-
-db.open(function (err, idegoDb) {
-  if (err) {
-    console.error("Error: " + err);
-  }
-
-  idego = idegoDb;
-
-  idego.createCollection('profiles', function (err, profilesCollection) {
-    profiles = profilesCollection;
-
-    idego.createCollection('counters', function (err, countersCollection) {
-      counters = countersCollection;
-    });
-  });
-});
+var PROFILES;
+var COUNTERS;
 
 var usedServices = [
-  //'Facebook',
   'foursquare',
   'GitHub',
   'Instagram',
   'Klout',
   'Meetup',
-  //'RunKeeper',
   'StockTwits',
   'Twitter'
 ];
+
+function initDb(cb) {
+  db.open(function (err, idegoDb) {
+    if (err) {
+      console.error("Error: " + err);
+    }
+
+    idegoDb.createCollection('profiles', function (err, profilesCollection) {
+      PROFILES = profilesCollection;
+
+      idegoDb.createCollection('counters', function (err, countersCollection) {
+        COUNTERS = countersCollection;
+
+        cb();
+      });
+    });
+  });
+}
 
 var oa = new OAuth2(process.env.SINGLY_CLIENT_ID,
   process.env.SINGLY_CLIENT_SECRET, process.env.API_URL);
 
 // A convenience method that takes care of adding the access token to requests
 function getProtectedResource(path, session, callback) {
-  oa.getProtectedResource(process.env.API_URL + path, session.access_token, callback);
+  oa.getProtectedResource(process.env.API_URL + path, session.access_token,
+    function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+
+    try {
+      data = JSON.parse(data);
+    } catch (parseErr) {
+      err = parseErr;
+    }
+
+    callback(err, data);
+  });
 }
 
 // Given the name of a service and the array of profiles, return a link to that
@@ -58,7 +71,8 @@ function getLink(prettyName, profiles) {
 
   // If the user has a profile authorized for this service
   if (profiles && profiles[service] !== undefined) {
-    return sprintf('<img class="connected" src="http://assets.singly.com/service-icons/32px/%s.png" title="%s: Connected" /> <span class="result"></span>', service, prettyName);
+    return sprintf('<img class="connected" src="http://assets.singly.com/service-icons/32px/%s.png" title="%s: Connected" /> ' +
+      '<span class="result"></span>', service, prettyName);
   }
 
   var queryString = querystring.stringify({
@@ -67,7 +81,8 @@ function getLink(prettyName, profiles) {
     service: service
   });
 
-  return sprintf('<a class="clean-gray" href="%s/oauth/authorize?%s"><img src="http://assets.singly.com/service-icons/32px/%s.png" title="%s" /> Authenticate %s</a>',
+  return sprintf('<a class="clean-gray" href="%s/oauth/authorize?%s">' +
+    '<img src="http://assets.singly.com/service-icons/32px/%s.png" title="%s" /> Authenticate %s</a>',
     process.env.API_URL,
     queryString,
     service,
@@ -109,54 +124,79 @@ app.configure('production', function () {
   app.use(express.errorHandler());
 });
 
-function updateProfiles(req, cb) {
-  if (req.session.access_token) {
-    getProtectedResource('/profiles', req.session, function (err, profilesBody) {
-      try {
-        profilesBody = JSON.parse(profilesBody);
-      } catch (parseErr) {
+// Returns the user's profiles with IDs parsed to integers
+function getParsedProfiles(req, cb) {
+  getProtectedResource('/profiles', req.session, function (err, profilesBody) {
+    _.each(profilesBody, function (value, key) {
+      if (!Array.isArray(value)) {
+        return;
       }
 
-      req.session.profiles = profilesBody;
+      profilesBody[key] = _.map(value, function (profile) {
+        return parseInt(profile, 10);
+      });
+    });
 
-      // XXX: This feels dirty.
-      profiles.findOne({ _id: profilesBody.id }, function (err, profile) {
-        if (profile === null) {
-          counters.findAndModify({ _id: "userId" },
-            [], { $inc: { count: 1 } }, function (err, userId) {
-            profile = {
-              _id: profilesBody.id,
-              username: req.session.username,
-              counterId: userId.count,
-              profiles: profilesBody
-            };
+    cb(profilesBody);
+  });
+}
 
-            profiles.insert(profile, { safe: true }, function (err, result) {
-              req.session.counterId = profile.counterId;
+// Updates the user's profiles, access token, and counterId
+function updateProfiles(req, cb) {
+  if (!req.session.access_token) {
+    return cb();
+  }
 
-              cb();
-            });
-          });
-        } else {
-          profile.profiles = profilesBody;
-          profile.username = req.session.username;
+  getParsedProfiles(req, function (profilesBody) {
+    req.session.profiles = profilesBody;
 
-          profiles.update({ _id: profilesBody.id }, profile, { safe: true },
-            function (err, result) {
+    // XXX: This feels dirty.
+    PROFILES.findOne({ _id: profilesBody.id }, function (err, profile) {
+      // If the user has no saved profiles
+      if (profile === null) {
+        COUNTERS.findAndModify({ _id: "userId" },
+          [], { $inc: { count: 1 } }, function (err, userId) {
+          profile = {
+            _id: profilesBody.id,
+            counterId: userId.count,
+            accessToken: req.session.access_token,
+            username: req.session.username,
+            profiles: profilesBody
+          };
+
+          PROFILES.insert(profile, { safe: true }, function (err) {
+            if (err) {
+              console.error('Error inserting', err);
+            }
+
             req.session.counterId = profile.counterId;
 
             cb();
           });
-        }
-      });
+        });
+      } else {
+        profile.accessToken = req.session.access_token;
+        profile.username = req.session.username;
+        profile.profiles = profilesBody;
+
+        PROFILES.update({ _id: profilesBody.id }, profile, { safe: true },
+          function (err) {
+          if (err) {
+            console.error('Error updating', err);
+          }
+
+          req.session.counterId = profile.counterId;
+
+          cb();
+        });
+      }
     });
-  } else {
-    cb();
-  }
+  });
 }
 
+// Returns the total number of idego users
 app.get('/users', function (req, res) {
-  counters.findOne({ _id: "userId" }, function (err, userId) {
+  COUNTERS.findOne({ _id: "userId" }, function (err, userId) {
     res.json(userId.count);
   });
 });
@@ -207,11 +247,6 @@ app.get('/', function (req, res) {
     // Retrieve the /profile endpoint from Singly
     getProtectedResource('/profile', req.session,
       function (err, profile) {
-      try {
-        profile = JSON.parse(profile);
-      } catch (parseErr) {
-      }
-
       // Get the user's full name from the Singly profile object
       req.session.username = (profile && profile.name) ? profile.name : '';
 
@@ -233,7 +268,7 @@ app.get('/profile/:id', function (req, res) {
     return res.error(500);
   }
 
-  profiles.findOne({ counterId: parseInt(req.params.id, 10) },
+  PROFILES.findOne({ counterId: parseInt(req.params.id, 10) },
     function (err, profile) {
     var services = [];
 
@@ -295,4 +330,6 @@ app.get('/callback', function (req, res) {
   });
 });
 
-app.listen(process.env.PORT);
+initDb(function () {
+  app.listen(process.env.PORT);
+});
