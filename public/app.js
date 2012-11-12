@@ -194,7 +194,7 @@ function doPublic(users) {
 
   if (accessToken !== 'undefined' &&
     accessToken !== undefined) {
-    $('#username').editable('/username', {
+    $('#username.mine').editable('/username', {
       submitdata: {
         accessToken: accessToken
       },

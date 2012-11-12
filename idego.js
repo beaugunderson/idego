@@ -453,12 +453,15 @@ app.get('/profile/:id', function (req, res) {
       }
     });
 
+    var counterId = parseInt(req.params.id, 10);
+
     res.render('profile', {
       accessToken: req.session.access_token,
       isPublic: true,
       services: services,
       username: profile.username,
-      counterId: parseInt(req.params.id, 10)
+      counterId: counterId,
+      mine: counterId === req.session.counterId
     });
   });
 });
