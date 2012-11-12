@@ -130,11 +130,6 @@ function blendedAverage(profiles, users) {
   var idSum = 0;
   var percentageSum = 0;
 
-  // Sum the users for all services
-  _.each(users, function (count) {
-    userSum += count;
-  });
-
   // Weight the user's percentage and ID by the number of users the service has
   _.each(profiles, function (profile, service) {
     if (!Array.isArray(profile)) {
@@ -145,8 +140,16 @@ function blendedAverage(profiles, users) {
       return;
     }
 
-    percentageSum += (parseInt(profile[0], 10) / users[service]) * users[service];
-    idSum += parseInt(profile[0], 10) * users[service];
+    var id = parseInt(profile[0], 10);
+
+    // Ten billion
+    if (id > 10000000000) {
+      return;
+    }
+
+    userSum += users[service];
+    percentageSum += (id / users[service]) * users[service];
+    idSum += id * users[service];
   });
 
   return {
@@ -216,15 +219,14 @@ function doPublic(users) {
 }
 
 function doFriends() {
-  singly.get('/friends/peers', { sort: 'first' }, function (friends) {
+  singly.get('/friends/peers', { sort: 'connected' }, function (friends) {
     friends.forEach(function (friend) {
-      $('#friends-list').append(sprintf('<li><a href="%s">' +
+      $('#friends-list').append(sprintf('<li><a href="%s" title="%s">' +
           '<span class="image-wrap card" style="background-image: url(%s);" /> ' +
-          '%s' +
         '</a></li>',
         '/compare/' + counterId + '/' + friend.peer,
-        friend.thumbnail_url,
-        friend.name));
+        friend.name,
+        friend.thumbnail_url));
     });
 
     if (friends.length > 4) {
@@ -232,7 +234,7 @@ function doFriends() {
         $('#friends').toggleClass('more');
 
         $('#friends-more a').text(
-          $('#friends-more a').text() === 'More' ? 'Less' : 'More');
+          $('#friends-more a').text() === 'Show all' ? 'Close' : 'Show all');
       });
 
       $('#friends-more').css('display', 'table-cell');

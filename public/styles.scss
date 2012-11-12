@@ -9,6 +9,20 @@ html, body {
   min-height: 100%;
 }
 
+.left {
+  text-align: left;
+}
+
+table {
+  width: 100%;
+}
+
+#leaderboard {
+  td:nth-child(n+2) {
+    text-align: center;
+  }
+}
+
 li.centered {
   text-align: center;
   font-weight: bold;
@@ -34,13 +48,25 @@ li.centered {
 
     #friends-header {
       display: table-cell;
-      min-width: 275px;
+      min-width: 260px;
 
       h1, h2, h3 {
         display: inline;
         margin: 1em;
         padding: 0;
         vertical-align: middle;
+      }
+    }
+
+    #friends-more {
+      display: none;
+      min-width: 120px;
+
+      #button {
+        height: 60px;
+        padding: 0.5em;
+        border-radius: 5px;
+        background-color: darken($middle, 10);
       }
     }
 
@@ -51,23 +77,13 @@ li.centered {
       width: 100%;
       text-align: center;
       display: table-cell;
+      overflow: hidden;
+      white-space: nowrap;
 
       li {
         display: inline-block;
         margin-right: 1.5em;
       }
-
-      li:nth-child(n+5) {
-        display: none;
-      }
-    }
-
-    #friends-more {
-      display: none;
-      min-width: 100px;
-      border-radius: 5px;
-      background-color: darken($middle, 10);
-      text-align: center;
     }
   }
 
@@ -76,12 +92,10 @@ li.centered {
 
     #friends-row {
       #friends-list {
+        white-space: initial;
+
         li {
           margin-bottom: 1em;
-        }
-
-        li:nth-child(n+5) {
-          display: inline-block;
         }
       }
     }
@@ -111,13 +125,13 @@ li.centered {
   display: inline-block;
   vertical-align: middle;
 
-  margin-right: 0.5em;
+  //margin-right: 0.5em;
 
   width: 60px;
   height: 60px;
 
-  background-position: center center;
-  background-size: contain;
+  background-position: top center;
+  background-size: cover;
   background-repeat: no-repeat;
 }
 
@@ -283,7 +297,8 @@ iframe {
 
 a.clean-gray {
   background-color: #eeeeee;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, #cccccc));
+  background-image: -webkit-gradient(linear, left top, left bottom,
+    color-stop(0%, #eeeeee), color-stop(100%, #cccccc));
   background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
   background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
   background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
@@ -304,7 +319,8 @@ a.clean-gray {
 
 a.clean-gray:hover {
   background-color: #dddddd;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #dddddd), color-stop(100%, #bbbbbb));
+  background-image: -webkit-gradient(linear, left top, left bottom,
+    color-stop(0%, #dddddd), color-stop(100%, #bbbbbb));
   background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
   background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);
   background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);

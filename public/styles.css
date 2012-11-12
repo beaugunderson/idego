@@ -2,6 +2,15 @@ html, body {
   height: 100%;
   min-height: 100%; }
 
+.left {
+  text-align: left; }
+
+table {
+  width: 100%; }
+
+#leaderboard td:nth-child(n+2) {
+  text-align: center; }
+
 li.centered {
   text-align: center;
   font-weight: bold; }
@@ -22,36 +31,38 @@ li.centered {
     display: table-row; }
     #friends #friends-row #friends-header {
       display: table-cell;
-      min-width: 275px; }
+      min-width: 260px; }
       #friends #friends-row #friends-header h1, #friends #friends-row #friends-header h2, #friends #friends-row #friends-header h3 {
         display: inline;
         margin: 1em;
         padding: 0;
         vertical-align: middle; }
+    #friends #friends-row #friends-more {
+      display: none;
+      min-width: 120px; }
+      #friends #friends-row #friends-more #button {
+        height: 60px;
+        padding: 0.5em;
+        border-radius: 5px;
+        background-color: #25292f; }
     #friends #friends-row #friends-list {
       padding: 0;
       margin: 0;
       list-style-type: none;
       width: 100%;
       text-align: center;
-      display: table-cell; }
+      display: table-cell;
+      overflow: hidden;
+      white-space: nowrap; }
       #friends #friends-row #friends-list li {
         display: inline-block;
         margin-right: 1.5em; }
-      #friends #friends-row #friends-list li:nth-child(n+5) {
-        display: none; }
-    #friends #friends-row #friends-more {
-      display: none;
-      min-width: 100px;
-      border-radius: 5px;
-      background-color: #25292f;
-      text-align: center; }
   #friends.more {
     height: initial; }
-    #friends.more #friends-row #friends-list li {
-      margin-bottom: 1em; }
-    #friends.more #friends-row #friends-list li:nth-child(n+5) {
-      display: inline-block; }
+    #friends.more #friends-row #friends-list {
+      white-space: initial; }
+      #friends.more #friends-row #friends-list li {
+        margin-bottom: 1em; }
 
 .authenticated #description {
   display: none; }
@@ -66,11 +77,10 @@ li.centered {
   position: relative;
   display: inline-block;
   vertical-align: middle;
-  margin-right: 0.5em;
   width: 60px;
   height: 60px;
-  background-position: center center;
-  background-size: contain;
+  background-position: top center;
+  background-size: cover;
   background-repeat: no-repeat; }
 
 #google-ads {

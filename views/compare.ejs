@@ -1,24 +1,26 @@
 <div class="<%= pageClass %>">
  <h1><a href="/">Are you an Early Adopter?</a></h1>
 
- <div class="span3">
-  <h2><a href="/profile/<%= one.counterId %>"><%= one.username %></a></h2>
+ <div class="row-fluid">
+  <div class="span6">
+   <h2><a href="/profile/<%= one.counterId %>"><%= one.username %></a></h2>
 
-  <ul id="auth" class="profile compare">
-   <% for (var i = 0; i < oneServices.length; i++) { %>
-   <li id="<%= oneServices[i].name.toLowerCase() %>"><%- oneServices[i].html %></li>
-   <% } %>
-  </ul>
- </div>
+   <ul id="auth" class="profile compare">
+    <% for (var i = 0; i < oneServices.length; i++) { %>
+    <li id="<%= oneServices[i].name.toLowerCase() %>"><%- oneServices[i].html %></li>
+    <% } %>
+   </ul>
+  </div>
 
- <div class="span3">
-  <h2><a href="/profile/<%= two.counterId %>"><%= two.username %></a></h2>
+  <div class="span6">
+   <h2><a href="/profile/<%= two.counterId %>"><%= two.username %></a></h2>
 
-  <ul id="auth" class="profile compare">
-   <% for (var i = 0; i < twoServices.length; i++) { %>
-   <li id="<%= twoServices[i].name.toLowerCase() %>"><%- twoServices[i].html %></li>
-   <% } %>
-  </ul>
+   <ul id="auth" class="profile compare">
+    <% for (var i = 0; i < twoServices.length; i++) { %>
+    <li id="<%= twoServices[i].name.toLowerCase() %>"><%- twoServices[i].html %></li>
+    <% } %>
+   </ul>
+  </div>
  </div>
 
  <div id="twitter-text-wrapper">

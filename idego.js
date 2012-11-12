@@ -142,6 +142,48 @@ function getParsedProfiles(req, cb) {
   });
 }
 
+// Returns the blended averages of a user's profiles
+function blendedAverage(profiles) {
+  var userSum = 0;
+  var idSum = 0;
+  var percentageSum = 0;
+  var serviceCount = 0;
+
+  // Require this here since it updates once a day
+  var users = require('./public/users.json');
+
+  // Weight the user's percentage and ID by the number of users the service has
+  _.each(profiles, function (profile, service) {
+    if (!Array.isArray(profile)) {
+      return;
+    }
+
+    if (!users[service]) {
+      return;
+    }
+
+    var id = parseInt(profile[0], 10);
+
+    // Ten billion
+    if (id > 10000000000) {
+      return;
+    }
+
+    serviceCount++;
+
+    userSum += users[service];
+    percentageSum += (id / users[service]) * users[service];
+    idSum += id * users[service];
+  });
+
+  return {
+    id: Math.round(idSum / userSum),
+    percentage: percentageSum / userSum,
+    services: serviceCount
+  };
+}
+
+
 // Updates the user's profiles, access token, and counterId
 function updateProfiles(req, cb) {
   if (!req.session.access_token) {
@@ -150,6 +192,8 @@ function updateProfiles(req, cb) {
 
   getParsedProfiles(req, function (profilesBody) {
     req.session.profiles = profilesBody;
+
+    var averages = blendedAverage(profilesBody);
 
     // XXX: This feels dirty.
     PROFILES.findOne({ _id: profilesBody.id }, function (err, profile) {
@@ -162,7 +206,8 @@ function updateProfiles(req, cb) {
             counterId: userId.count,
             accessToken: req.session.access_token,
             username: req.session.username,
-            profiles: profilesBody
+            profiles: profilesBody,
+            blendedAverage: averages
           };
 
           PROFILES.insert(profile, { safe: true }, function (err) {
@@ -179,6 +224,7 @@ function updateProfiles(req, cb) {
         profile.accessToken = req.session.access_token;
         profile.username = req.session.username;
         profile.profiles = profilesBody;
+        profile.blendedAverage = averages;
 
         PROFILES.update({ _id: profilesBody.id }, profile, { safe: true },
           function (err) {
@@ -202,21 +248,58 @@ app.get('/users', function (req, res) {
   });
 });
 
+app.get('/leaderboard', function (req, res) {
+  res.render('leaderboard', {
+    pageClass: req.session.access_token ? 'authenticated' : '',
+    isPublic: true,
+    accessToken: req.session.access_token,
+    profiles: req.session.profiles,
+    counterId: req.session.counterId
+  });
+});
+
 app.get('/leaderboard/:service', function (req, res) {
   if (!req.param('service')) {
     res.send(404);
   }
 
-  var key = 'profiles.' + req.param('service');
+  var sort = -1;
 
-  var fields = ['username', 'counterId', key];
+  if (req.param('sort') !== undefined) {
+    sort = parseInt(req.param('sort'), 10);
+  }
+
+  var key = 'profiles.' + req.param('service');
+  var arrayKey = key + '.0';
+
+  var sortKey = {};
+
+  sortKey[arrayKey] = sort;
+
+  var fields = ['username', 'counterId'];
+
+  if (req.param('service') === 'blended') {
+    key = 'blendedAverage.percentage';
+    arrayKey = key;
+    sortKey = {
+      'blendedAverage.services': sort,
+      'blendedAverage.percentage': sort === -1 ? 1 : -1
+    };
+
+    fields.push('blendedAverage');
+    fields.push('profiles');
+  } else {
+    fields.push(key);
+  }
 
   var query = {};
 
-  query[key + '.0'] = { $exists: true, $gt: -1 };
+  query[arrayKey] = { $exists: true, $gt: -1 };
 
-  PROFILES.find(query, fields).sort(key + '.0').limit(50).toArray(function (err,
-    profiles) {
+  PROFILES.find(query, fields)
+    .sort(sortKey)
+    .limit(50)
+    .toArray(function (err, profiles) {
     res.send(profiles);
   });
 });
