@@ -248,8 +248,14 @@ app.get('/users', function (req, res) {
   });
 });
 
-app.get('/leaderboard', function (req, res) {
-  res.render('leaderboard', {
+app.get('/leaderboard/:service', function (req, res) {
+  var template = 'leaderboard';
+
+  if (req.param('service') === 'blended') {
+    template = 'leaderboard-blended';
+  }
+
+  res.render(template, {
     pageClass: req.session.access_token ? 'authenticated' : '',
     isPublic: true,
     accessToken: req.session.access_token,
@@ -258,12 +264,12 @@ app.get('/leaderboard', function (req, res) {
   });
 });
 
-app.get('/leaderboard/:service', function (req, res) {
+app.get('/leaderboard.json', function (req, res) {
   if (!req.param('service')) {
     res.send(404);
   }
 
-  var sort = -1;
+  var sort = 1;
 
   if (req.param('sort') !== undefined) {
     sort = parseInt(req.param('sort'), 10);
@@ -282,8 +288,8 @@ app.get('/leaderboard/:service', function (req, res) {
     key = 'blendedAverage.percentage';
     arrayKey = key;
     sortKey = {
-      'blendedAverage.services': sort,
-      'blendedAverage.percentage': sort === -1 ? 1 : -1
+      'blendedAverage.services': sort === -1 ? 1 : -1,
+      'blendedAverage.percentage': sort === 1 ? -1 : 1
     };
 
     fields.push('blendedAverage');

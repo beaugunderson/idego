@@ -260,6 +260,12 @@ $(function () {
   $.getJSON('/users.json', function (users) {
     if (isPublic) {
       doPublic(users);
+
+      if (accessToken === 'undefined' ||
+        accessToken === undefined) {
+        return;
+      }
+
       doFriends();
 
       return;

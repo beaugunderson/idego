@@ -52,7 +52,6 @@ li.centered {
 
       h1, h2, h3 {
         display: inline;
-        margin: 1em;
         padding: 0;
         vertical-align: middle;
       }
@@ -189,6 +188,18 @@ body {
   color: $text;
 }
 
+h1 {
+  font-size: 1.8em;
+}
+
+h2 {
+  font-size: 1.4em;
+}
+
+h3 {
+  font-size: 1.15em;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Arvo', serif;
   color: $header;
@@ -202,6 +213,12 @@ h1, h2, h3, h4, h5, h6 {
 
 a, a:visited {
   color: $accent;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+  color: lighten($accent, 10);
 }
 
 .extended {
@@ -239,14 +256,6 @@ img.connected {
 
 #ajax-error-details {
   font-size: 0.8em;
-}
-
-a, a:visited {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: none;
 }
 
 .check {

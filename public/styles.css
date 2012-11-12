@@ -34,7 +34,6 @@ li.centered {
       min-width: 260px; }
       #friends #friends-row #friends-header h1, #friends #friends-row #friends-header h2, #friends #friends-row #friends-header h3 {
         display: inline;
-        margin: 1em;
         padding: 0;
         vertical-align: middle; }
     #friends #friends-row #friends-more {
@@ -124,6 +123,15 @@ body {
   background-color: #1d181f;
   color: #eeeeee; }
 
+h1 {
+  font-size: 1.8em; }
+
+h2 {
+  font-size: 1.4em; }
+
+h3 {
+  font-size: 1.15em; }
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Arvo', serif;
   color: #e3ff99;
@@ -133,7 +141,12 @@ h1, h2, h3, h4, h5, h6 {
     color: #e3ff99; }
 
 a, a:visited {
-  color: #ffc1a9; }
+  color: #ffc1a9;
+  text-decoration: none; }
+
+a:hover {
+  text-decoration: none;
+  color: #ffe6dc; }
 
 .extended {
   padding-left: 3em; }
@@ -163,12 +176,6 @@ img.connected {
 
 #ajax-error-details {
   font-size: 0.8em; }
-
-a, a:visited {
-  text-decoration: none; }
-
-a:hover {
-  text-decoration: none; }
 
 .check {
   color: #25aae1;
