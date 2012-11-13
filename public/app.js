@@ -241,6 +241,8 @@ function doFriends() {
     }
 
     if (friends.length) {
+      $('body').addClass('friends-visible');
+
       $('#friends').show();
     }
   });
