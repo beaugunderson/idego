@@ -288,8 +288,8 @@ app.get('/leaderboard.json', function (req, res) {
     key = 'blendedAverage.percentage';
     arrayKey = key;
     sortKey = {
-      'blendedAverage.services': sort === -1 ? 1 : -1,
-      'blendedAverage.percentage': sort === 1 ? -1 : 1
+      'blendedAverage.services': sort === 1 ? -1 : 1,
+      'blendedAverage.percentage': sort
     };
 
     fields.push('blendedAverage');

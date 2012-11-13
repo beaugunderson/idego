@@ -6,7 +6,8 @@ html, body {
   text-align: left; }
 
 table {
-  width: 100%; }
+  width: 100%;
+  margin-bottom: 1em; }
 
 #leaderboard td:nth-child(n+2) {
   text-align: center; }
@@ -133,10 +134,11 @@ h3 {
   font-size: 1.15em; }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Arvo', serif;
+  font-family: 'ArvoBold', Georgia, serif;
   color: #e3ff99;
   margin-bottom: 0.5em;
-  font-weight: bold; }
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased; }
   h1 a, h1 a:visited, h2 a, h2 a:visited, h3 a, h3 a:visited, h4 a, h4 a:visited, h5 a, h5 a:visited, h6 a, h6 a:visited {
     color: #e3ff99; }
 
