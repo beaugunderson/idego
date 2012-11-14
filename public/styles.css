@@ -38,14 +38,18 @@ li.centered {
     display: table-row; }
     #friends #friends-row #friends-header {
       display: table-cell;
-      min-width: 260px; }
-      #friends #friends-row #friends-header h1, #friends #friends-row #friends-header h2, #friends #friends-row #friends-header h3 {
+      min-width: 280px; }
+      #friends #friends-row #friends-header h3 {
         display: inline;
         padding: 0;
-        vertical-align: middle; }
+        margin: 0;
+        line-height: initial; }
+      #friends #friends-row #friends-header span {
+        font-size: 0.6em; }
     #friends #friends-row #friends-more {
       display: none;
-      min-width: 120px; }
+      min-width: 120px;
+      padding-left: 1em; }
       #friends #friends-row #friends-more #button {
         height: 60px;
         padding: 0.5em;

@@ -59,18 +59,24 @@ li.centered {
 
     #friends-header {
       display: table-cell;
-      min-width: 260px;
+      min-width: 280px;
 
-      h1, h2, h3 {
+      h3 {
         display: inline;
         padding: 0;
-        vertical-align: middle;
+        margin: 0;
+        line-height: initial;
+      }
+
+      span {
+        font-size: 0.6em;
       }
     }
 
     #friends-more {
       display: none;
       min-width: 120px;
+      padding-left: 1em;
 
       #button {
         height: 60px;
