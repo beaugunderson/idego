@@ -104,11 +104,11 @@ li.centered {
   }
 
   &.more {
-    height: initial;
+    height: auto;
 
     #friends-row {
       #friends-list {
-        white-space: initial;
+        white-space: normal;
 
         li {
           margin-bottom: 1em;

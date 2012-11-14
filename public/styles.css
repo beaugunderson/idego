@@ -68,9 +68,9 @@ li.centered {
         display: inline-block;
         margin-right: 1.5em; }
   #friends.more {
-    height: initial; }
+    height: auto; }
     #friends.more #friends-row #friends-list {
-      white-space: initial; }
+      white-space: normal; }
       #friends.more #friends-row #friends-list li {
         margin-bottom: 1em; }
 
