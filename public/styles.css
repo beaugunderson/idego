@@ -16,15 +16,21 @@ li.centered {
   text-align: center;
   font-weight: bold; }
 
+.friends-visible #friends {
+  bottom: 0; }
+
 #friends {
+  -webkit-transition: bottom 0.3s ease-in;
+  -moz-transition: bottom 0.3s ease-in;
+  -o-transition: bottom 0.3s ease-in;
+  transition: bottom 0.3s ease-in;
   position: fixed;
-  left: 0px;
-  bottom: 0px;
+  left: 0;
+  bottom: -101px;
   height: 60px;
   z-index: 10000;
   border-top: 5px solid #382e3c;
-  display: none;
-  padding: 1em;
+  padding: 18px;
   background-color: #3b424c;
   width: 100%; }
   #friends #friends-row {
