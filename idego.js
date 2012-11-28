@@ -67,7 +67,7 @@ function getProtectedResource(path, session, callback) {
 
 // Given the name of a service and the array of profiles, return a link to that
 // service that's styled appropriately (i.e. show a link or an image).
-function getLink(prettyName, profiles) {
+function getLink(prettyName, profiles, accessToken) {
   var service = prettyName.toLowerCase();
 
   // If the user has a profile authorized for this service
@@ -76,13 +76,19 @@ function getLink(prettyName, profiles) {
       '<span class="result"></span>', service, prettyName);
   }
 
-  var queryString = querystring.stringify({
+  var options = {
     client_id: process.env.SINGLY_CLIENT_ID,
     redirect_uri: sprintf('%s/callback', process.env.HOST_URL),
     service: service
-  });
+  };
 
-  return sprintf('<a class="clean-gray" href="%s/oauth/authorize?%s">' +
+  if (accessToken) {
+    options.access_token = accessToken;
+  }
+
+  var queryString = querystring.stringify(options);
+
+  return sprintf('<a class="clean-gray" href="%s/oauth/authenticate?%s">' +
     '<img src="http://assets.singly.com/service-icons/32px/%s.png" title="%s" /> Authenticate %s</a>',
     process.env.API_URL,
     queryString,
@@ -317,7 +323,7 @@ function renderIndex(req, res, isPublic) {
   usedServices.forEach(function (service) {
     services.push({
       name: service,
-      link: getLink(service, req.session.profiles)
+      link: getLink(service, req.session.profiles, req.session.access_token)
     });
   });
 
