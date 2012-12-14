@@ -10,6 +10,7 @@
       "sprintf": "*",
       "querystring": "*",
       "mongodb": "*",
+      "nodefly": "stable",
       "oauth": "*",
       "underscore": "*",
       "connect-mongo": "*"
