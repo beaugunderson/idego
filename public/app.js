@@ -1,4 +1,5 @@
-/*global accessToken:true isPublic:true Spinner:true counterId:true*/
+/*global accessToken:true isPublic:true Spinner:true counterId:true, $:true,
+  _:true, isPublic:true, sprintf:true, counterId:true*/
 
 var baseUrl = 'https://api.singly.com';
 
@@ -15,6 +16,13 @@ var singly = {
   }
 };
 
+function commas(number) {
+  return String(number).replace(/(^|[^\w.])(\d{4,})/g, function ($0, $1, $2) {
+    return $1 + $2.replace(/\d(?=(?:\d\d\d)+(?!\d))/g, "$&,");
+  });
+}
+
+/*
 var spinnerOptions = {
   lines: 10,
   length: 4,
@@ -33,12 +41,6 @@ var spinnerOptions = {
 };
 
 var spinners = {};
-
-function commas(number) {
-  return String(number).replace(/(^|[^\w.])(\d{4,})/g, function ($0, $1, $2) {
-    return $1 + $2.replace(/\d(?=(?:\d\d\d)+(?!\d))/g, "$&,");
-  });
-}
 
 function instagramFriends(userId, cb) {
   singly.get('/services/instagram/follows', { fields: 'data.id', limit: 5000 },
@@ -113,6 +115,7 @@ var extendedResults = {
   foursquare: foursquareFriends,
   instagram: instagramFriends
 };
+*/
 
 var serviceNames = {
   foursquare: 'foursquare',
@@ -218,6 +221,7 @@ function doPublic(users) {
   return;
 }
 
+/*
 function doFriends() {
   singly.get('/friends/peers', { sort: 'connected' }, function (friends) {
     friends.forEach(function (friend) {
@@ -245,6 +249,7 @@ function doFriends() {
     }
   });
 }
+*/
 
 $(function () {
   $('#ajax-error').ajaxError(function (e, jqxhr, settings, exception) {
@@ -266,7 +271,7 @@ $(function () {
         return;
       }
 
-      doFriends();
+      //doFriends();
 
       return;
     }
@@ -276,7 +281,7 @@ $(function () {
       return;
     }
 
-    doFriends();
+    //doFriends();
 
     singly.get('/profiles', null, function (profiles) {
       var average = blendedAverage(profiles, users);
@@ -310,6 +315,8 @@ $(function () {
           commas(profile[0]) + '</span>: You\'re in the first ' +
           '<span class="accent">' + percentage + '%</span> of users.');
 
+        // Singly no longer supports the friends endpoints we were using
+        /*
         if (extendedResults[service] !== undefined) {
           $('#' + service + ' .result').append(
             '<div class="extended">Loading...</div>');
@@ -323,6 +330,7 @@ $(function () {
             $('#' + service + ' .result .extended').html(extendedResult);
           });
         }
+        */
       });
 
       $.getJSON('/users', function (users) {
