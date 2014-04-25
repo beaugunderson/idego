@@ -1,11 +1,3 @@
-var hostname      = require('os').hostname();
-var processNumber = process.env.INDEX_OF_PROCESS || 0;
-
-require('nodefly').profile(
-  '71f89d2ff878b055a2baccd162dd40f3',
-  ['idego', hostname, processNumber]
-);
-
 var async = require('async');
 var express = require('express');
 var OAuth2 = require('oauth').OAuth2;
